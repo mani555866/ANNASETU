@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnnaSetu — Smart Food Donation &amp; Orphanage Support Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#1F4B3F;
+  --forest-dark:#123028;
+  --mango:#E8A33D;
+  --mango-light:#F6D9A6;
+  --clay:#C1443D;
+  --bg:#F3F6F1;
+  --surface:#FFFFFF;
+  --ink:#16241D;
+  --ink-soft:#5B6B62;
+  --line:#DEE5DC;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;}
+h1,h2,h3{font-family:'Fraunces',serif;margin:0;letter-spacing:-0.01em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+button{font-family:'Inter',sans-serif;cursor:pointer;border:none;}
+input,select,textarea{font-family:'Inter',sans-serif;}
+
+/* ---------- Shell ---------- */
+.shell{display:flex;min-height:100vh;}
+.sidebar{width:230px;flex-shrink:0;background:var(--forest);color:#EAF2EC;display:flex;flex-direction:column;padding:22px 14px;position:sticky;top:0;height:100vh;}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 22px 8px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:16px;}
+.brand-mark{width:34px;height:34px;border-radius:9px;background:var(--mango);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;color:var(--forest-dark);font-size:18px;}
+.brand-name{font-family:'Fraunces',serif;font-size:18px;font-weight:600;line-height:1.1;}
+.brand-sub{font-size:10.5px;opacity:.65;letter-spacing:.04em;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;color:#CFE0D5;font-size:13.5px;font-weight:500;margin-bottom:2px;background:transparent;width:100%;text-align:left;transition:background .15s;}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
+.nav-item.active{background:var(--mango);color:var(--forest-dark);font-weight:600;}
+.nav-icon{width:18px;text-align:center;font-size:14px;}
+.sidebar-foot{margin-top:auto;font-size:10.5px;opacity:.5;padding:10px 8px 0 8px;border-top:1px solid rgba(255,255,255,.1);}
+
+.main{flex:1;padding:30px 38px 60px 38px;max-width:1180px;}
+.topbar{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px;flex-wrap:wrap;gap:12px;}
+.topbar h1{font-size:26px;}
+.topbar p{margin:4px 0 0 0;color:var(--ink-soft);font-size:13.5px;}
+.pill{background:var(--surface);border:1px solid var(--line);padding:7px 13px;border-radius:20px;font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;background:#3B9E6D;}
+.dot.sync{animation:pulse 1.6s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.sync-pill{cursor:pointer;}
+.sync-pill:hover{border-color:var(--forest);}
+
+/* ---------- Cards / grids ---------- */
+.grid{display:grid;gap:16px;}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+.grid-2{grid-template-columns:1.3fr .9fr;}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+.stat-card{position:relative;overflow:hidden;}
+.stat-label{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);font-weight:600;}
+.stat-value{font-family:'Fraunces',serif;font-size:32px;font-weight:600;margin-top:6px;color:var(--forest);transition:color .3s;}
+.stat-value.bump{color:var(--mango);}
+.stat-sub{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+
+.harvest-wrap{display:flex;align-items:center;gap:22px;}
+.harvest-ring{position:relative;width:140px;height:140px;flex-shrink:0;}
+.harvest-ring svg{transform:rotate(-90deg);}
+.harvest-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.harvest-center .n{font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--forest);}
+.harvest-center .l{font-size:9.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;}
+
+/* ---------- Forms ---------- */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field.full{grid-column:1/-1;}
+.field label{font-size:12px;font-weight:600;color:var(--ink-soft);}
+.field input,.field select,.field textarea{padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;background:#FBFCFA;color:var(--ink);}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--mango);outline-offset:0;border-color:var(--mango);}
+.btn{padding:11px 20px;border-radius:9px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;}
+.btn-primary{background:var(--forest);color:#fff;}
+.btn-primary:hover{background:var(--forest-dark);}
+.btn-mango{background:var(--mango);color:var(--forest-dark);}
+.btn-mango:hover{filter:brightness(1.05);}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink);}
+.btn-ghost:hover{border-color:var(--forest);}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:7px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
+
+/* ---------- Lists ---------- */
+.list-item{border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin-bottom:10px;background:#FCFDFB;}
+.list-item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.tag{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.03em;}
+.tag-veg{background:#E3F3E5;color:#1F7A3D;}
+.tag-nonveg{background:#FBE4E1;color:var(--clay);}
+.tag-status-pending{background:var(--mango-light);color:#8A5A0C;}
+.tag-status-accepted{background:#DDEFE3;color:#1F7A3D;}
+.tag-status-urgent{background:#FBE4E1;color:var(--clay);}
+.match-score{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);flex-wrap:wrap;}
+.match-bar{width:70px;height:5px;background:#EDF1EA;border-radius:3px;overflow:hidden;}
+.match-bar-fill{height:100%;background:linear-gradient(90deg,var(--mango),var(--forest));}
+
+.empty{text-align:center;padding:40px 20px;color:var(--ink-soft);font-size:13.5px;}
+.empty .big{font-size:30px;margin-bottom:8px;}
+
+.section-title{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--forest);display:flex;align-items:center;gap:8px;}
+.section-title .n{background:var(--mango);color:var(--forest-dark);width:20px;height:20px;border-radius:6px;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;}
+
+.qr-box{width:100px;height:100px;background:repeating-conic-gradient(var(--forest) 0% 25%, #fff 0% 50%) 0 0/12px 12px, #fff;border:2px solid var(--forest);border-radius:8px;margin:0 auto;}
+
+.toast{position:fixed;bottom:22px;right:22px;background:var(--forest);color:#fff;padding:13px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:99;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ---------- Chat ---------- */
+.chat-picker{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.chat-picker select{flex:1;min-width:160px;}
+.chat-window{border:1px solid var(--line);border-radius:11px;background:#FBFCFA;height:320px;display:flex;flex-direction:column;}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;}
+.msg{max-width:72%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.4;}
+.msg .m-from{font-size:10px;opacity:.7;font-weight:700;text-transform:uppercase;margin-bottom:2px;}
+.msg.donor{align-self:flex-end;background:var(--forest);color:#fff;border-bottom-right-radius:3px;}
+.msg.home{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:3px;}
+.chat-input{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);}
+.chat-input input{flex:1;}
+
+.progress-track{height:6px;background:#EDF1EA;border-radius:4px;overflow:hidden;margin-top:8px;}
+.progress-fill{height:100%;background:var(--mango);}
+
+/* ---------- Profiles / Avatars ---------- */
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:16px;flex-shrink:0;}
+.avatar.mango{background:var(--mango);color:var(--forest-dark);}
+.avatar.lg{width:64px;height:64px;font-size:22px;}
+.profile-card{border:1px solid var(--line);border-radius:12px;padding:16px;background:#FCFDFB;display:flex;gap:12px;align-items:flex-start;}
+.profile-card .pc-body{flex:1;min-width:0;}
+.profile-card h3{font-size:15px;}
+.profile-card .pc-meta{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+.profile-card .pc-stats{display:flex;gap:14px;margin-top:10px;font-size:11.5px;color:var(--ink-soft);flex-wrap:wrap;}
+.profile-card .pc-stats b{color:var(--forest);font-family:'JetBrains Mono',monospace;}
+.tab-count{background:rgba(255,255,255,.18);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-left:auto;}
+.nav-item.active .tab-count{background:var(--forest);color:#fff;}
+
+/* ---------- Session chip ---------- */
+.session-chip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);padding:5px 12px 5px 5px;border-radius:22px;}
+.session-chip .avatar{width:28px;height:28px;font-size:12px;}
+.session-chip span{font-size:12px;font-weight:600;}
+.session-chip button{font-size:11px;color:var(--clay);background:none;font-weight:600;}
+
+/* ---------- Login ---------- */
+.login-wrap{max-width:400px;margin:20px auto 0 auto;}
+.login-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:34px 30px;text-align:center;}
+.login-card .avatar{margin:0 auto 14px auto;}
+.login-card .form-grid{grid-template-columns:1fr;text-align:left;margin-top:18px;}
+.login-hint{font-size:12px;color:var(--ink-soft);margin-top:16px;}
+.login-hint button{background:none;color:var(--forest);font-weight:700;text-decoration:underline;font-size:12px;}
+.demo-note{background:var(--mango-light);color:#7A4E0C;font-size:11.5px;padding:8px 12px;border-radius:8px;margin-top:14px;text-align:left;}
+
+/* ---------- Modal ---------- */
+.modal-backdrop{position:fixed;inset:0;background:rgba(18,48,40,.45);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+.modal-backdrop.show{display:flex;}
+.modal{background:var(--surface);border-radius:16px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;padding:26px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+.modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:var(--bg);color:var(--ink-soft);font-size:14px;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:var(--line);}
+.modal-head{display:flex;gap:14px;align-items:center;margin-bottom:16px;}
+.modal-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;}
+.modal-row:last-child{border-bottom:none;}
+.modal-row span:first-child{color:var(--ink-soft);}
+.modal-row span:last-child{font-weight:600;text-align:right;}
+
+/* ---------- Payment methods ---------- */
+.pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pay-opt{border:2px solid var(--line);border-radius:11px;padding:13px 8px;text-align:center;background:#FCFDFB;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.pay-opt:hover{border-color:var(--mango);}
+.pay-opt.sel{border-color:var(--forest);background:#EAF3EC;}
+.pay-opt .p-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;}
+.pay-opt .p-label{font-size:11.5px;font-weight:600;}
+.p-gpay{background:linear-gradient(135deg,#4285F4,#34A853);}
+.p-phonepe{background:#5F259F;}
+.p-paytm{background:#00BAF2;}
+.p-upi{background:var(--forest);}
+.p-razorpay{background:#0C2451;}
+.p-bank{background:#6B7280;}
+
+/* ---------- Receipt page ---------- */
+.receipt-wrap{max-width:460px;margin:10px auto 0 auto;}
+.receipt-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:0;overflow:hidden;box-shadow:0 10px 30px rgba(18,48,40,.06);}
+.receipt-top{background:var(--forest);color:#fff;padding:30px 26px 24px 26px;text-align:center;}
+.receipt-check{width:56px;height:56px;border-radius:50%;background:var(--mango);color:var(--forest-dark);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px auto;}
+.receipt-amt{font-family:'Fraunces',serif;font-size:34px;font-weight:700;}
+.receipt-body{padding:22px 26px;}
+.receipt-dash{border-top:2px dashed var(--line);margin:6px 0 14px 0;}
+.receipt-actions{display:flex;gap:10px;padding:0 26px 26px 26px;}
+.receipt-actions .btn{flex:1;justify-content:center;}
+
+@media print{
+  .sidebar,.topbar,.receipt-actions,.toast{display:none !important;}
+  .main{padding:0;}
+}
+
+@media(max-width:900px){
+  .shell{flex-direction:column;}
+  .sidebar{width:100%;height:auto;position:relative;flex-direction:row;overflow-x:auto;}
+  .brand,.sidebar-foot{display:none;}
+  .grid-4{grid-template-columns:1fr 1fr;}
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .pay-grid{grid-template-columns:repeat(2,1fr);}
+  .main{padding:20px;}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div><div class="brand-name">AnnaSetu</div><div class="brand-sub">Food → Care Bridge</div></div>
+    </div>
+    <button class="nav-item active" data-tab="dashboard"><span class="nav-icon">◆</span> Dashboard</button>
+    <button class="nav-item" data-tab="login"><span class="nav-icon">🔑</span> Donor Login</button>
+    <button class="nav-item" data-tab="home-login"><span class="nav-icon">🔐</span> Home Admin Login</button>
+    <button class="nav-item" data-tab="donor-reg"><span class="nav-icon">＋</span> Donor Registration</button>
+    <button class="nav-item" data-tab="home-reg"><span class="nav-icon">🏠</span> Home Registration</button>
+    <button class="nav-item" data-tab="donate-food"><span class="nav-icon">🍲</span> Donate Food</button>
+    <button class="nav-item" data-tab="homes"><span class="nav-icon">☰</span> Homes &amp; AI Match</button>
+    <button class="nav-item" data-tab="profiles"><span class="nav-icon">👤</span> Profiles<span class="tab-count" id="profileCount">0</span></button>
+    <button class="nav-item" data-tab="emergency"><span class="nav-icon">!</span> Emergency Requests</button>
+    <button class="nav-item" data-tab="chat"><span class="nav-icon">💬</span> WhatsApp Chat</button>
+    <button class="nav-item" data-tab="history"><span class="nav-icon">⟲</span> Donation History</button>
+    <div class="sidebar-foot">Final Year Project Prototype<br>v0.3 — live shared storage</div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <p id="pageSub">Live overview of food, funds and impact</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="pill sync-pill" id="syncPill" title="Click to sync now"><span class="dot sync"></span> <span id="syncLabel">Connecting…</span></div>
+        <div id="sessionChip"></div>
+      </div>
+    </div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modalContent"></div></div>
+
+<script>
+/* ================= STATE (mirrors shared persistent storage) ================= */
+const state = {
+  donors: [], homes: [], foodDonations: [], emergencies: [],
+  session: null,
+  homeSession: null,
+  currentTab: 'dashboard',
+};
+
+const DEFAULTS = {
+  donors: [{id:'D001', name:'Kannan Raj', type:'Hotel', hotel:'Sri Anandha Bhavan', phone:'9840012345', password:'123456', driverName:'Murugan S.', driverVehicle:'Bike · TN 09 AX 4521', driverPhone:'9876500011', driverEta:'27', lat:12.9716, lng:79.1325, donations:6, foodKg:210, money:4500, rating:4.7}],
+  homes: [
+    {id:'H001', name:"Snehalaya Children's Home", type:"Children's Home", regNo:'TN/CHD/2018/0234', students:42, lat:12.9260, lng:79.1370, need:'High', foodReq:'45 meals/day', upi:'snehalaya@upi', address:'Katpadi, Vellore', phone:'9843011111', password:'123456'},
+    {id:'H002', name:'Shanthi Old Age Home', type:'Old Age Home', regNo:'TN/OAH/2015/0987', students:28, lat:13.0100, lng:79.0900, need:'Medium', foodReq:'30 meals/day', upi:'shanthi.oah@upi', address:'Gudiyatham, Vellore', phone:'9843022222', password:'123456'},
+    {id:'H003', name:'Karunai Illam', type:'Orphanage', regNo:'TN/ORP/2020/0456', students:60, lat:12.8900, lng:79.2200, need:'High', foodReq:'65 meals/day', upi:'karunai@upi', address:'Ranipet', phone:'9843033333', password:'123456'},
+  ],
+  foodDonations: [{id:'FD-SEED-1', food:'Veg Biryani + Curry', qty:50, vegType:'Veg', matchedHome:'Karunai Illam', matchedHomeId:'H003', donorName:'Kannan Raj', donorId:'D001', score:92, status:'Pending', driver:null}],
+  emergencies: [{id:'E1', home:'Karunai Illam', item:'Rice (25kg) + Milk', urgency:'High', posted:'2 hrs ago'}],
+};
+
+/* ================= STORAGE LAYER (real persistence via window.storage, shared=true = live across everyone using this artifact) ================= */
+const STORE_KEYS = ['donors','homes','foodDonations','emergencies'];
+
+/* Circuit breaker: if the shared storage backend is unreachable/erroring, we stop
+   hitting it (no repeated failures, no error noise) and run fully on in-memory state
+   instead — every button and form keeps working, just without cross-device sync. */
+let storageAvailable = (typeof window !== 'undefined' && !!window.storage);
+let storageFailCount = 0;
+const MAX_FAILS = 2;
+
+function withTimeout(promise, ms=4000){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error('storage timeout')), ms))
+  ]);
+}
+function noteStorageFailure(){
+  storageFailCount++;
+  if(storageFailCount>=MAX_FAILS && storageAvailable){
+    storageAvailable = false;
+    setSync('💾 Local mode — working on this device only', false);
+  }
+}
+async function storageGet(key, shared){
+  if(!storageAvailable) return null;
+  try{
+    const r = await withTimeout(window.storage.get(key, shared));
+    return r ? JSON.parse(r.value) : null;
+  }catch(err){ return null; } // a missing key throws too — treat as "not found", not a fatal error
+}
+async function storageSet(key, value, shared){
+  if(!storageAvailable) return false;
+  try{
+    await withTimeout(window.storage.set(key, JSON.stringify(value), shared));
+    storageFailCount = 0;
+    return true;
+  }catch(err){ noteStorageFailure(); return false; }
+}
+
+async function loadAll(){
+  for(const key of STORE_KEYS){
+    const val = await storageGet(key, true);
+    if(val !== null){
+      state[key] = val; // fresh data from storage
+    } else if(!state._booted){
+      state[key] = DEFAULTS[key]; // first run — seed sensible demo defaults
+      storageSet(key, state[key], true); // best-effort background write, never blocks UI
+    }
+    // otherwise: storage unavailable or nothing new — keep whatever is already in memory
+  }
+  if(!state._booted){
+    const sess = await storageGet('session', false);
+    if(sess) state.session = sess;
+    const hsess = await storageGet('homeSession', false);
+    if(hsess) state.homeSession = hsess;
+  }
+  state._booted = true;
+}
+
+function persist(key){
+  // fire-and-forget: UI never waits on the network, so every button stays instant and reliable
+  storageSet(key, state[key], true);
+}
+function persistSession(){
+  storageSet('session', state.session, false);
+}
+function persistHomeSession(){
+  storageSet('homeSession', state.homeSession, false);
+}
+
+/* ================= UTIL ================= */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+// Manually checks required fields on a form and returns a FormData if all pass,
+// or null (with a toast telling the person what's missing) if not. We do this
+// ourselves instead of relying on native HTML5 "required" validation, which can
+// silently block a plain submit button with no visible feedback.
+function validateForm(form, requiredNames, labels){
+  const f = new FormData(form);
+  for(const name of requiredNames){
+    const val = (f.get(name)||'').toString().trim();
+    if(!val){
+      toast('⚠ Please fill: '+(labels&&labels[name] ? labels[name] : name));
+      const field = form.querySelector(`[name="${name}"]`);
+      if(field) field.focus();
+      return null;
+    }
+  }
+  return f;
+}
+function haversine(lat1,lng1,lat2,lng2){
+  const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function needWeight(need){ return need==='High'?1:need==='Medium'?0.6:0.3; }
+function extractMealsNeed(foodReq){
+  if(!foodReq) return null;
+  const m = String(foodReq).match(/(\d+)/);
+  return m ? Number(m[1]) : null;
+}
+/* AI Feature: Priority / Match Score = f(distance, need urgency, capacity, and — when a
+   quantity is supplied — how well that quantity fits the home's actual meal requirement) */
+function aiMatchScore(donorLat, donorLng, home, qty){
+  const dist = haversine(donorLat, donorLng, home.lat, home.lng);
+  const distScore = Math.max(0, 1 - dist/40);
+  const needScore = needWeight(home.need);
+  const sizeScore = Math.min(1, home.students/70);
+  if(qty===undefined || qty===null || qty==='' || isNaN(Number(qty))){
+    const score = (distScore*0.5 + needScore*0.35 + sizeScore*0.15) * 100;
+    return {dist, score: Math.round(score)};
+  }
+  const req = extractMealsNeed(home.foodReq) || home.students;
+  const rawFit = 1 - Math.abs(Number(qty)-req)/Math.max(req,1);
+  const qtyFit = Math.max(0, Math.min(1, rawFit));
+  const score = (distScore*0.35 + needScore*0.25 + sizeScore*0.10 + qtyFit*0.30) * 100;
+  return {dist, score: Math.round(Math.max(0,Math.min(100,score))), qtyFit: Math.round(qtyFit*100), req};
+}
+function ringSVG(pct, size=140, stroke=12){
+  const r=(size-stroke)/2, c=2*Math.PI*r, off=c-(pct/100)*c;
+  return `<svg width="${size}" height="${size}">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="#EDF1EA" stroke-width="${stroke}" fill="none"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="url(#g1)" stroke-width="${stroke}" fill="none"
+      stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"/>
+    <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E8A33D"/><stop offset="100%" stop-color="#1F4B3F"/></linearGradient></defs>
+  </svg>`;
+}
+function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function genId(prefix){ return prefix+Date.now().toString().slice(-8)+Math.floor(Math.random()*90+10); }
+// Opens a real WhatsApp chat (wa.me) with the given number, pre-filled with a greeting.
+// Indian 10-digit numbers get the +91 country code added automatically.
+function openWhatsApp(rawPhone, message){
+  if(!rawPhone){ toast('⚠ No WhatsApp number on file for this contact'); return; }
+  let digits = String(rawPhone).replace(/\D/g,'');
+  if(digits.length===10) digits = '91'+digits;
+  const url = 'https://wa.me/'+digits+(message ? '?text='+encodeURIComponent(message) : '');
+  window.open(url, '_blank');
+}
+
+/* ---------- Modal ---------- */
+function openModal(html){
+  document.getElementById('modalContent').innerHTML = `<button class="modal-close" id="modalClose">✕</button>${html}`;
+  document.getElementById('modalBackdrop').classList.add('show');
+  document.getElementById('modalClose').onclick = closeModal;
+}
+function closeModal(){ document.getElementById('modalBackdrop').classList.remove('show'); }
+document.getElementById('modalBackdrop').addEventListener('click', e=>{ if(e.target.id==='modalBackdrop') closeModal(); });
+
+function donorProfileModal(d){
+  return `<div class="modal-head"><div class="avatar lg mango">${initials(d.name)}</div><div><h3>${d.name}</h3><div class="pc-meta">${d.hotel||'Individual Donor'} ${d.type?'· '+d.type:''}</div></div></div>
+    <div class="modal-row"><span>Donor ID</span><span class="mono">${d.id}</span></div>
+    <div class="modal-row"><span>Phone</span><span>${d.phone||'—'}</span></div>
+    <div class="modal-row"><span>Email</span><span>${d.email||'—'}</span></div>
+    <div class="modal-row"><span>WhatsApp</span><span>${d.whatsapp||d.phone||'—'}</span></div>
+    <div class="modal-row"><span>Location</span><span>${d.location||'—'}</span></div>
+    <div class="modal-row"><span>Pickup Driver</span><span>${d.driverName||'Not set'}</span></div>
+    <div class="modal-row"><span>Vehicle</span><span>${d.driverVehicle||'—'}</span></div>
+    <div class="modal-row"><span>Driver Phone</span><span>${d.driverPhone||'—'}</span></div>
+    <div class="modal-row"><span>Usual ETA</span><span>${d.driverEta ? d.driverEta+' mins' : '—'}</span></div>
+    <div class="modal-row"><span>Total Donations</span><span>${d.donations||0}</span></div>
+    <div class="modal-row"><span>Food Donated</span><span>${d.foodKg||0} kg</span></div>
+    <div class="modal-row"><span>Rating</span><span>${d.rating? '★ '+d.rating : 'New donor'}</span></div>
+    <button class="btn btn-mango btn-sm" style="margin-top:16px;width:100%;justify-content:center;" data-action="whatsapp-donor" data-donor-id="${d.id}">💬 Message on WhatsApp</button>`;
+}
+function homeProfileModal(h){
+  return `<div class="modal-head"><div class="avatar lg">${initials(h.name)}</div><div><h3>${h.name}</h3><div class="pc-meta">${h.type} · Reg No: ${h.regNo}</div></div></div>
+    <div class="modal-row"><span>Residents</span><span>${h.students}</span></div>
+    <div class="modal-row"><span>Current Need</span><span>${h.need}</span></div>
+    <div class="modal-row"><span>Food Requirement</span><span>${h.foodReq}</span></div>
+    <div class="modal-row"><span>Phone</span><span>${h.phone||'—'}</span></div>
+    <div class="modal-row"><span>Address / District</span><span>${h.address||'—'}</span></div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" data-action="donate-food-to" data-home="${h.name}">Donate Food</button>
+      <button class="btn btn-mango btn-sm" style="flex:1;justify-content:center;" data-action="whatsapp-home" data-home-id="${h.id}">💬 Message on WhatsApp</button>
+    </div>`;
+}
+
+/* ---------- Session chip / sync pill ---------- */
+function updateSessionChip(){
+  const el = document.getElementById('sessionChip');
+  const chips = [];
+  if(state.session){
+    chips.push(`<div class="session-chip"><div class="avatar mango">${initials(state.session.name)}</div><span>${state.session.name.split(' ')[0]}</span><button id="logoutDonorBtn">Logout</button></div>`);
+  }
+  if(state.homeSession){
+    chips.push(`<div class="session-chip"><div class="avatar">${initials(state.homeSession.name)}</div><span>${state.homeSession.name.split(' ')[0]}</span><button id="logoutHomeBtn">Logout</button></div>`);
+  }
+  if(!chips.length){
+    el.innerHTML = `<button class="btn btn-ghost btn-sm" id="topLoginBtn">🔑 Login</button>`;
+    document.getElementById('topLoginBtn').onclick = ()=>{ document.querySelector('[data-tab="login"]').click(); };
+    return;
+  }
+  el.innerHTML = `<div style="display:flex;gap:8px;">${chips.join('')}</div>`;
+  const ld = document.getElementById('logoutDonorBtn');
+  if(ld) ld.onclick = ()=>{ state.session=null; persistSession(); toast('👋 Donor logged out'); render(state.currentTab); };
+  const lh = document.getElementById('logoutHomeBtn');
+  if(lh) lh.onclick = ()=>{ state.homeSession=null; persistHomeSession(); toast('👋 Home admin logged out'); render(state.currentTab); };
+}
+function updateCounts(){
+  document.getElementById('profileCount').textContent = state.donors.length + state.homes.length;
+}
+function setSync(label, live){
+  document.getElementById('syncLabel').textContent = label;
+  document.querySelector('#syncPill .dot').style.background = live ? '#3B9E6D' : '#E8A33D';
+  document.querySelector('#syncPill .dot').classList.toggle('sync', live);
+}
+function highlightNav(tab){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+}
+
+/* ================= VIEWS ================= */
+const titles = {
+  dashboard:['Dashboard','Live overview of food, funds and impact'],
+  login:['Donor Login','Access your donor account'],
+  'home-login':['Home Admin Login','Access your registered home account'],
+  'donor-reg':['Donor Registration','Onboard a hotel, restaurant, hall or individual donor'],
+  'home-reg':['Home Registration',"Register an orphanage, old age home or children's home"],
+  'donate-food':['Donate Food','Post surplus food — AI finds the best-matched home'],
+  homes:['Homes & AI Match','Ranked by AI priority score: need, distance, capacity'],
+  profiles:['Profiles','All registered donor and home profiles — synced live'],
+  emergency:['Emergency Requests','Urgent needs posted by homes, visible to nearby donors'],
+  chat:['WhatsApp Chat','Message any donor or home directly on WhatsApp'],
+  history:['Donation History','Full record of food donations'],
+};
+
+function render(tab){
+  state.currentTab = tab;
+  document.getElementById('pageTitle').textContent = titles[tab][0];
+  document.getElementById('pageSub').textContent = titles[tab][1];
+  document.getElementById('view').innerHTML = viewFns[tab]();
+  attachHandlers(tab);
+  updateSessionChip();
+  updateCounts();
+}
+
+const viewFns = {
+  dashboard(){
+    const totalFoodKg = state.foodDonations.reduce((s,f)=>s+Number(f.qty||0),0);
+    const peopleFed = Math.round(totalFoodKg*1.8);
+    const goalKg = 1000;
+    const pct = Math.min(100, Math.round((totalFoodKg/goalKg)*100));
+    const vegCount = state.foodDonations.filter(f=>f.vegType!=='Non-Veg').length;
+    const nonVegCount = state.foodDonations.length - vegCount;
+    const openEmergencies = state.emergencies.filter(e=>true).length;
+    const topDonor = [...state.donors].sort((a,b)=>(b.donations||0)-(a.donations||0))[0];
+    const topHome = [...state.homes].sort((a,b)=>b.students-a.students)[0];
+    return `
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card stat-card"><div class="stat-label">Registered Homes</div><div class="stat-value" id="statHomes">${state.homes.length}</div><div class="stat-sub">across ${new Set(state.homes.map(h=>h.type)).size} categories</div></div>
+      <div class="card stat-card"><div class="stat-label">Registered Donors</div><div class="stat-value" id="statDonors">${state.donors.length}</div><div class="stat-sub">hotels, halls &amp; individuals</div></div>
+      <div class="card stat-card"><div class="stat-label">Meals Donated</div><div class="stat-value" id="statMeals">${totalFoodKg}</div><div class="stat-sub">across ${state.foodDonations.length} food donations</div></div>
+      <div class="card stat-card"><div class="stat-label">People Fed (est.)</div><div class="stat-value" id="statFed">${peopleFed}</div><div class="stat-sub">based on meals donated</div></div>
+    </div>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card stat-card"><div class="stat-label">Veg / Non-Veg</div><div class="stat-value" style="font-size:22px;">${vegCount} / ${nonVegCount}</div><div class="stat-sub">meals donated split</div></div>
+      <div class="card stat-card"><div class="stat-label">Emergency Requests</div><div class="stat-value" style="font-size:22px;">${openEmergencies}</div><div class="stat-sub">posted by homes so far</div></div>
+      <div class="card stat-card"><div class="stat-label">Top Donor</div><div class="stat-value" style="font-size:16px;">${topDonor?topDonor.name:'—'}</div><div class="stat-sub">${topDonor?(topDonor.donations||0)+' donations':'no donors yet'}</div></div>
+      <div class="card stat-card"><div class="stat-label">Most Needy Home</div><div class="stat-value" style="font-size:16px;">${topHome?topHome.name:'—'}</div><div class="stat-sub">${topHome?topHome.students+' residents · '+topHome.need+' need':'no homes yet'}</div></div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="section-title"><span class="n">1</span> Recent Food Donations</div>
+        ${renderFoodList(true)}
+      </div>
+      <div class="card">
+        <div class="section-title"><span class="n">2</span> Harvest Meter</div>
+        <div class="harvest-wrap">
+          <div class="harvest-ring">${ringSVG(pct)}<div class="harvest-center"><div class="n">${pct}%</div><div class="l">of goal</div></div></div>
+          <div>
+            <div class="stat-sub" style="margin-bottom:6px;">${totalFoodKg} kg saved of ${goalKg} kg monthly goal</div>
+            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <div style="margin-top:14px;font-size:12px;color:var(--ink-soft)"><b style="color:var(--forest)">Live:</b> every form on this site — registration, food, emergency requests — is saved instantly and reflected here for every visitor. Chat happens directly on WhatsApp.</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  login(){
+    if(state.session){
+      const d = state.session;
+      return `<div class="login-wrap"><div class="login-card">
+        <div class="avatar lg mango" style="margin:0 auto 14px auto;">${initials(d.name)}</div>
+        <h3>Welcome back, ${d.name.split(' ')[0]}!</h3>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;">You're logged in as a donor.</p>
+        <div class="pc-stats" style="justify-content:center;margin-top:16px;">
+          <span>Donations <b>${d.donations||0}</b></span><span>Food <b>${d.foodKg||0}kg</b></span><span>Rating <b>${d.rating||'—'}</b></span>
+        </div>
+        <button class="btn btn-primary btn-sm" style="margin-top:18px;" id="goProfile">View My Profile</button>
+      </div></div>`;
+    }
+    return `<div class="login-wrap"><div class="login-card">
+      <div class="avatar lg">🔑</div><h3>Donor Login</h3>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin-top:4px;">Login with your registered mobile number</p>
+      <form id="loginForm" class="form-grid">
+        <div class="field"><label>Registered Mobile Number</label><input required name="phone" placeholder="9840012345"></div>
+        <div class="field"><label>Password / OTP</label><input required type="password" name="password" placeholder="••••••" value="123456"></div>
+        <button type="button" id="loginSubmitBtn" class="btn btn-primary" style="justify-content:center;margin-top:4px;">Login</button>
+      </form>
+      <div class="demo-note">Demo tip: try <b>9840012345</b> (Kannan Raj, pre-registered) — any password works in this prototype.</div>
+      <div class="login-hint">New donor? <button id="goRegister">Register here</button></div>
+    </div></div>`;
+  },
+
+  'home-login'(){
+    if(state.homeSession){
+      const h = state.homeSession;
+      return `<div class="login-wrap"><div class="login-card">
+        <div class="avatar lg" style="margin:0 auto 14px auto;">${initials(h.name)}</div>
+        <h3>Welcome back, ${h.name}!</h3>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;">Logged in as Home Admin · ${h.type}</p>
+        <div class="pc-stats" style="justify-content:center;margin-top:16px;">
+          <span>Residents <b>${h.students}</b></span><span>Need <b>${h.need}</b></span>
+        </div>
+        <button class="btn btn-primary btn-sm" style="margin-top:18px;" id="goHomeProfile">View My Profile</button>
+      </div></div>`;
+    }
+    return `<div class="login-wrap"><div class="login-card">
+      <div class="avatar lg">🔐</div><h3>Home Admin Login</h3>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin-top:4px;">Login with your registered mobile number</p>
+      <form id="homeLoginForm" class="form-grid">
+        <div class="field"><label>Registered Mobile Number</label><input required name="phone" placeholder="9843011111"></div>
+        <div class="field"><label>Password</label><input required type="password" name="password" placeholder="••••••"></div>
+        <button type="button" id="homeLoginSubmitBtn" class="btn btn-primary" style="justify-content:center;margin-top:4px;">Login</button>
+      </form>
+      <div class="demo-note">Demo tip: try <b>9843011111</b> (Snehalaya Children's Home) — password <b>123456</b>.</div>
+      <div class="login-hint">New home? <button id="goHomeRegister">Register here</button></div>
+    </div></div>`;
+  },
+
+  'donor-reg'(){
+    return `<div class="card" style="max-width:720px;">
+      <form id="donorForm" class="form-grid">
+        <div class="field"><label>Full Name</label><input required name="name" placeholder="e.g. Kannan Raj"></div>
+        <div class="field"><label>Mobile Number</label><input required name="phone" placeholder="98400 12345"></div>
+        <div class="field"><label>Set Password</label><input required type="password" name="password" placeholder="Choose a password"></div>
+        <div class="field"><label>Donor Type</label><select name="type"><option>Hotel</option><option>Restaurant</option><option>Marriage Hall</option><option>Individual</option></select></div>
+        <div class="field"><label>Hotel / Business Name</label><input name="hotel" placeholder="Sri Anandha Bhavan"></div>
+        <div class="field"><label>Email</label><input type="email" name="email" placeholder="you@example.com"></div>
+        <div class="field"><label>WhatsApp Number</label><input name="whatsapp" placeholder="98400 12345"></div>
+        <div class="field full"><label>Current Location (Address / Area)</label><input name="location" placeholder="e.g. Katpadi, Vellore"></div>
+        <div class="field full" style="border-top:1px solid var(--line);margin-top:6px;padding-top:16px;">
+          <label style="font-size:13px;color:var(--forest);">🚴 Pickup / Delivery Details <span style="font-weight:400;color:var(--ink-soft);">(shown to homes when they accept your food donation)</span></label>
+        </div>
+        <div class="field"><label>Driver / Delivery Person Name</label><input name="driverName" placeholder="e.g. Murugan S."></div>
+        <div class="field"><label>Vehicle Details</label><input name="driverVehicle" placeholder="e.g. Bike · TN 09 AX 4521"></div>
+        <div class="field"><label>Driver Phone Number</label><input name="driverPhone" placeholder="9876500011"></div>
+        <div class="field"><label>Usual Pickup ETA (minutes)</label><input type="number" name="driverEta" placeholder="e.g. 27"></div>
+        <div class="field full" style="flex-direction:row;gap:20px;align-items:center;">
+          <button type="button" id="donorRegSubmitBtn" class="btn btn-mango">Register as Donor</button>
+          <span style="font-size:12px;color:var(--ink-soft)">Every field is saved to live shared storage instantly.</span>
+        </div>
+      </form>
+    </div>`;
+  },
+
+  'home-reg'(){
+    return `<div class="card" style="max-width:760px;">
+      <form id="homeForm" class="form-grid">
+        <div class="field full"><label>Home Name</label><input required name="name" placeholder="e.g. Snehalaya Children's Home"></div>
+        <div class="field"><label>Registration Number</label><input required name="regNo" placeholder="TN/CHD/2024/0001"></div>
+        <div class="field"><label>Home Type</label><select name="type"><option>Orphanage</option><option>Old Age Home</option><option>Children's Home</option></select></div>
+        <div class="field"><label>Total Student / Resident Count</label><input required type="number" name="students" placeholder="42"></div>
+        <div class="field"><label>Current Food Requirement</label><input name="foodReq" placeholder="45 meals/day"></div>
+        <div class="field"><label>Current Need Level</label><select name="need"><option>High</option><option>Medium</option><option>Low</option></select></div>
+        <div class="field"><label>Mobile Number</label><input required name="phone" placeholder="9876543210"></div>
+        <div class="field"><label>Set Password</label><input required type="password" name="password" placeholder="Choose a password"></div>
+        <div class="field"><label>UPI ID (for QR donations)</label><input name="upi" placeholder="homename@upi"></div>
+        <div class="field full"><label>Address / District</label><input name="address" placeholder="e.g. Vellore, Tamil Nadu"></div>
+        <div class="field full" style="flex-direction:row;gap:20px;align-items:center;">
+          <button type="button" id="homeRegSubmitBtn" class="btn btn-primary">Register Home</button>
+          <span style="font-size:12px;color:var(--ink-soft)">Saved to live shared storage instantly.</span>
+        </div>
+      </form>
+    </div>`;
+  },
+
+  'donate-food'(){
+    return `<div class="grid grid-2">
+      <div class="card">
+        <div class="section-title"><span class="n">1</span> Post Surplus Food</div>
+        <form id="foodForm" class="form-grid">
+          <div class="field"><label>Food Name</label><input required name="food" placeholder="Veg Biryani + Curry"></div>
+          <div class="field"><label>Quantity (meals)</label><input required type="number" name="qty" id="qtyInput" placeholder="50"></div>
+          <div class="field"><label>Veg / Non-Veg</label><select name="vegType" id="vegInput"><option>Veg</option><option>Non-Veg</option></select></div>
+          <div class="field"><label>Prepared Time</label><input type="time" name="prepTime"></div>
+          <div class="field"><label>Pickup Before</label><input type="time" name="pickupTime"></div>
+          <div class="field"><label>Donor Name</label><input name="donorName" value="${state.session? state.session.name : 'Kannan Raj'}"></div>
+          <div class="field full" style="flex-direction:row;gap:20px;align-items:center;"><button type="button" id="foodSubmitBtn" class="btn btn-mango">Donate Food — Confirm AI Match</button></div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="section-title"><span class="n">AI</span> Live Match Ranking</div>
+        <div id="liveMatchList">${renderLiveMatch('')}</div>
+        <div id="aiPreview" style="font-size:12.5px;color:var(--ink-soft);margin-top:14px;border-top:1px solid var(--line);padding-top:12px;">Enter a quantity above — scores update live as you type, factoring in distance, urgency, capacity <b>and</b> how well the quantity fits each home's meal requirement. Submit to lock in the AI-matched home.</div>
+      </div>
+    </div>`;
+  },
+
+  
+
+  homes(){
+    const donorRef = state.session || state.donors[0];
+    const ranked = state.homes.map(h=>({...h, ...aiMatchScore(donorRef.lat, donorRef.lng, h)})).sort((a,b)=>b.score-a.score);
+    return `<div class="card">
+      <div class="section-title"><span class="n">AI</span> Ranked by priority score (relative to donor: ${donorRef.hotel||donorRef.name})</div>
+      ${ranked.map((h,i)=>`
+        <div class="list-item">
+          <div class="list-item-head">
+            <div><b>${i===0?'🏆 ':''}${h.name}</b><div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">${h.type} · ${h.students} residents · ${h.foodReq}</div></div>
+            <span class="tag ${h.need==='High'?'tag-status-urgent':h.need==='Medium'?'tag-status-pending':'tag-status-accepted'}">${h.need} need</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+            <div class="match-score">Match score <div class="match-bar"><div class="match-bar-fill" style="width:${h.score}%"></div></div><b style="color:var(--forest)">${h.score}/100</b><span>· ${h.dist.toFixed(1)} km away</span></div>
+            <button class="btn btn-sm btn-ghost" data-action="view-home" data-home-id="${h.id}">View Profile</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  },
+
+  profiles(){
+    return `
+    <div class="section-title"><span class="n">👤</span> Donor Profiles (${state.donors.length})</div>
+    <div class="grid grid-3" style="margin-bottom:22px;">
+      ${state.donors.map(d=>`<div class="profile-card"><div class="avatar mango">${initials(d.name)}</div><div class="pc-body">
+        <h3>${d.name}</h3><div class="pc-meta">${d.hotel||'Individual'}</div>
+        <div class="pc-stats"><span>Donations <b>${d.donations||0}</b></span><span>Rating <b>${d.rating||'new'}</b></span></div>
+        <button class="btn btn-sm btn-ghost" style="margin-top:10px;width:100%;justify-content:center;" data-action="view-donor" data-donor-id="${d.id}">View Full Profile</button>
+      </div></div>`).join('')}
+    </div>
+    <div class="section-title"><span class="n">🏠</span> Home Profiles (${state.homes.length})</div>
+    <div class="grid grid-3">
+      ${state.homes.map(h=>`<div class="profile-card"><div class="avatar">${initials(h.name)}</div><div class="pc-body">
+        <h3>${h.name}</h3><div class="pc-meta">${h.type}</div>
+        <div class="pc-stats"><span>Residents <b>${h.students}</b></span><span>Need <b>${h.need}</b></span></div>
+        <button class="btn btn-sm btn-ghost" style="margin-top:10px;width:100%;justify-content:center;" data-action="view-home" data-home-id="${h.id}">View Full Profile</button>
+      </div></div>`).join('')}
+    </div>`;
+  },
+
+  emergency(){
+    return `<div class="grid grid-2">
+      <div class="card">
+        <div class="section-title"><span class="n">1</span> Post Emergency Request <span style="font-weight:400;color:var(--ink-soft)">(Home Admin)</span></div>
+        <form id="emergForm" class="form-grid">
+          <div class="field full"><label>Home</label><select name="home">${state.homes.map(h=>`<option>${h.name}</option>`).join('')}</select></div>
+          <div class="field"><label>Item Needed</label><input required name="item" placeholder="Rice, Milk, Blankets..."></div>
+          <div class="field"><label>Urgency</label><select name="urgency"><option>High</option><option>Medium</option></select></div>
+          <div class="field full" style="flex-direction:row;gap:20px;align-items:center;"><button type="button" id="emergSubmitBtn" class="btn btn-primary">Post Request</button></div>
+        </form>
+      </div>
+      <div class="card"><div class="section-title"><span class="n">2</span> Active Emergency Requests</div><div id="emergList">${renderEmergencyList()}</div></div>
+    </div>`;
+  },
+
+  chat(){
+    const dOpts = state.donors.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+    const hOpts = state.homes.map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
+    return `<div class="card" style="max-width:520px;">
+      <div class="section-title"><span class="n">💬</span> Chat on WhatsApp — any donor, any home</div>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-4px;margin-bottom:16px;">Pick a donor and a home below — this opens a real WhatsApp chat with them, pre-filled with an introduction message.</p>
+      <div class="chat-picker" style="margin-bottom:16px;">
+        <select id="chatDonorSel">${dOpts}</select>
+        <span style="align-self:center;color:var(--ink-soft);font-size:12px;">↔</span>
+        <select id="chatHomeSel">${hOpts}</select>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-mango" id="waToHomeBtn" style="flex:1;justify-content:center;">💬 Message Home on WhatsApp</button>
+        <button class="btn btn-primary" id="waToDonorBtn" style="flex:1;justify-content:center;">💬 Message Donor on WhatsApp</button>
+      </div>
+      <div style="margin-top:14px;font-size:11.5px;color:var(--ink-soft)">Opens a new tab at wa.me with the selected contact's number — real WhatsApp, not a mock chat.</div>
+    </div>`;
+  },
+
+  history(){
+    return `<div class="card">
+      <div class="section-title"><span class="n">🍲</span> Food Donation History</div>
+      ${renderFoodList(false)}
+    </div>`;
+  },
+};
+
+function renderLiveMatch(qty){
+  const donor = state.session || state.donors[0];
+  const ranked = state.homes
+    .map(h=>({...h, ...aiMatchScore(donor.lat, donor.lng, h, qty)}))
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,3);
+  return ranked.map((h,i)=>`
+    <div class="list-item" style="padding:11px 14px;margin-bottom:8px;">
+      <div class="list-item-head">
+        <div><b>${i===0?'🏆 ':''}${h.name}</b><div style="font-size:11.5px;color:var(--ink-soft);margin-top:2px;">${h.type} · needs ~${h.req||h.students} meals · ${h.need} need</div></div>
+        <span class="tag ${h.need==='High'?'tag-status-urgent':h.need==='Medium'?'tag-status-pending':'tag-status-accepted'}">${h.need}</span>
+      </div>
+      <div class="match-score" style="margin-top:8px;">
+        <div class="match-bar"><div class="match-bar-fill" style="width:${h.score}%"></div></div>
+        <b style="color:var(--forest)">${h.score}/100</b>
+        <span>· ${h.dist.toFixed(1)} km</span>
+        ${h.qtyFit!==undefined ? `<span>· qty fit ${h.qtyFit}%</span>` : ''}
+      </div>
+    </div>`).join('');
+}
+function renderFoodList(limit3){
+  const items = state.foodDonations.slice().reverse().slice(0, limit3?3:100);
+  if(!items.length) return `<div class="empty"><div class="big">🍲</div>No food donations yet.</div>`;
+  return items.map((f,idx)=>{
+    const fid = f.id || ('legacy-'+idx);
+    const status = f.status || 'Pending';
+    const statusTag = status==='Accepted' ? 'tag-status-accepted' : status==='Rejected' ? 'tag-status-urgent' : 'tag-status-pending';
+    return `
+    <div class="list-item">
+      <div class="list-item-head"><div><b>${f.food}</b><div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">${f.qty} meals ${f.donorName?'· from '+f.donorName:''}</div></div><span class="tag ${f.vegType==='Non-Veg'?'tag-nonveg':'tag-veg'}">${f.vegType}</span></div>
+      <div class="match-score" style="margin-top:8px;">AI matched → <b style="color:var(--forest)">${f.matchedHome}</b><div class="match-bar"><div class="match-bar-fill" style="width:${f.score}%"></div></div>${f.score}%</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+        <span class="tag ${statusTag}">${status}</span>
+        ${status==='Pending' ? `
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-sm btn-primary" data-action="accept-food" data-food-id="${fid}">✓ Accept</button>
+            <button class="btn btn-sm btn-ghost" data-action="reject-food" data-food-id="${fid}">✕ Reject</button>
+          </div>` : ''}
+      </div>
+      ${status==='Accepted' && f.driver ? `
+        <div style="margin-top:10px;background:#EAF3EC;border-radius:9px;padding:10px 12px;font-size:12px;color:var(--ink);">
+          <b style="color:var(--forest)">🚴 Pickup confirmed</b><br>
+          Driver: <b>${f.driver.name}</b> · ${f.driver.vehicle} · ${f.driver.phone}<br>
+          ETA: <b>${f.driver.eta}</b>
+        </div>` : ''}
+      ${status==='Rejected' ? `<div style="margin-top:8px;font-size:11.5px;color:var(--ink-soft);">This home couldn't accept the donation this time.</div>` : ''}
+    </div>`;
+  }).join('');
+}
+function renderEmergencyList(){
+  if(!state.emergencies.length) return `<div class="empty">No active requests.</div>`;
+  return state.emergencies.slice().reverse().map(e=>`
+    <div class="list-item"><div class="list-item-head"><div><b>${e.item}</b><div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">${e.home}</div></div>
+      <span class="tag ${e.urgency==='High'?'tag-status-urgent':'tag-status-pending'}">${e.urgency}</span></div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;">Posted ${e.posted} · Notified to nearby donors</div></div>`).join('');
+}
+
+
+/* ================= GLOBAL ACTION DELEGATION ================= */
+document.body.addEventListener('click', e=>{
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const action = btn.dataset.action;
+  if(action==='view-home'){ const h = state.homes.find(x=>x.id===btn.dataset.homeId); if(h) openModal(homeProfileModal(h)); }
+  if(action==='view-donor'){ const d = state.donors.find(x=>x.id===btn.dataset.donorId); if(d) openModal(donorProfileModal(d)); }
+  if(action==='donate-food-to'){ closeModal(); document.querySelector('[data-tab="donate-food"]').click(); toast('Pre-filled for '+btn.dataset.home); }
+  if(action==='whatsapp-donor'){
+    const d = state.donors.find(x=>x.id===btn.dataset.donorId);
+    if(d){ closeModal(); openWhatsApp(d.whatsapp||d.phone, `Vanakkam ${d.name}! Message from AnnaSetu regarding a food donation.`); }
+  }
+  if(action==='whatsapp-home'){
+    const h = state.homes.find(x=>x.id===btn.dataset.homeId);
+    if(h){ closeModal(); openWhatsApp(h.phone, `Vanakkam! This is regarding a food donation to ${h.name} via AnnaSetu.`); }
+  }
+  if(action==='accept-food'){
+    const fd = state.foodDonations.find((x,idx)=>(x.id||('legacy-'+idx))===btn.dataset.foodId);
+    if(!fd){ toast('Could not find that donation'); return; }
+    const donor = state.donors.find(d=>d.id===fd.donorId);
+    fd.status = 'Accepted';
+    if(donor && donor.driverName){
+      // Use the pickup/delivery details the donor entered during registration
+      fd.driver = {
+        name: donor.driverName,
+        vehicle: donor.driverVehicle || '—',
+        phone: donor.driverPhone || donor.phone || '—',
+        eta: (donor.driverEta ? donor.driverEta+' mins' : '20-30 mins')
+      };
+    } else {
+      // Fallback demo driver, only used if this donor never filled in pickup details
+      const drivers = [
+        {name:'Murugan S.', vehicle:'Bike · TN 09 AX 4521', phone:'9876500011'},
+        {name:'Rajesh Kumar', vehicle:'Auto · TN 23 BC 7788', phone:'9876500022'},
+        {name:'Prakash V.', vehicle:'Van · TN 12 CD 3344', phone:'9876500033'},
+      ];
+      fd.driver = {...drivers[Math.floor(Math.random()*drivers.length)], eta: (15+Math.floor(Math.random()*20))+' mins'};
+    }
+    persist('foodDonations');
+    toast('✅ Accepted — pickup details shared with '+(fd.donorName||'the donor'));
+    render(state.currentTab);
+  }
+  if(action==='reject-food'){
+    const fd = state.foodDonations.find((x,idx)=>(x.id||('legacy-'+idx))===btn.dataset.foodId);
+    if(!fd){ toast('Could not find that donation'); return; }
+    fd.status = 'Rejected';
+    persist('foodDonations');
+    toast('Donation marked as rejected');
+    render(state.currentTab);
+  }
+});
+
+/* ================= HANDLERS ================= */
+function attachHandlers(tab){
+  if(tab==='login'){
+    if(state.session){ const goBtn=document.getElementById('goProfile'); if(goBtn) goBtn.onclick=()=>{document.querySelector('[data-tab="profiles"]').click();}; return; }
+    document.getElementById('loginSubmitBtn').onclick = async ()=>{
+      const form = document.getElementById('loginForm');
+      const f = validateForm(form, ['phone','password'], {phone:'Mobile Number', password:'Password'});
+      if(!f) return;
+      const phone = f.get('phone').trim();
+      const pass = f.get('password');
+      const found = state.donors.find(d=>d.phone===phone || d.phone===phone.replace(/\s/g,''));
+      if(!found){ toast('⚠ No donor found with that number — please register first'); return; }
+      if(found.password && found.password!==pass){ toast('⚠ Incorrect password'); return; }
+      state.session = found; await persistSession(); toast('✅ Welcome back, '+found.name+'!'); render('login');
+    };
+    document.getElementById('goRegister').onclick = ()=>{ document.querySelector('[data-tab="donor-reg"]').click(); };
+  }
+  if(tab==='home-login'){
+    if(state.homeSession){ const goBtn=document.getElementById('goHomeProfile'); if(goBtn) goBtn.onclick=()=>{document.querySelector('[data-tab="profiles"]').click();}; return; }
+    document.getElementById('homeLoginSubmitBtn').onclick = async ()=>{
+      const form = document.getElementById('homeLoginForm');
+      const f = validateForm(form, ['phone','password'], {phone:'Mobile Number', password:'Password'});
+      if(!f) return;
+      const phone = f.get('phone').trim();
+      const pass = f.get('password');
+      const found = state.homes.find(h=>h.phone===phone || h.phone===phone.replace(/\s/g,''));
+      if(!found){ toast('⚠ No home found with that number — please register first'); return; }
+      if(found.password && found.password!==pass){ toast('⚠ Incorrect password'); return; }
+      state.homeSession = found; persistHomeSession(); toast('✅ Welcome back, '+found.name+'!'); render('home-login');
+    };
+    document.getElementById('goHomeRegister').onclick = ()=>{ document.querySelector('[data-tab="home-reg"]').click(); };
+  }
+  if(tab==='donor-reg'){
+    document.getElementById('donorRegSubmitBtn').onclick = async ()=>{
+      const form = document.getElementById('donorForm');
+      const f = validateForm(form, ['name','phone','password'], {name:'Full Name', phone:'Mobile Number', password:'Password'});
+      if(!f) return;
+      const newDonor = {id:genId('D'), name:f.get('name'), type:f.get('type'), hotel:f.get('hotel')||f.get('name'), phone:f.get('phone'), password:f.get('password'), email:f.get('email'), whatsapp:f.get('whatsapp'), location:f.get('location'), driverName:f.get('driverName'), driverVehicle:f.get('driverVehicle'), driverPhone:f.get('driverPhone'), driverEta:f.get('driverEta'), lat:12.97+Math.random()*0.08-0.04, lng:79.13+Math.random()*0.08-0.04, donations:0, foodKg:0, money:0, rating:0};
+      state.donors.push(newDonor);
+      await persist('donors');
+      state.session = newDonor; await persistSession();
+      toast('✅ Registered & logged in as '+f.get('name'));
+      form.reset();
+      updateCounts();
+      updateSessionChip();
+    };
+  }
+  if(tab==='home-reg'){
+    document.getElementById('homeRegSubmitBtn').onclick = async ()=>{
+      const form = document.getElementById('homeForm');
+      const f = validateForm(form, ['name','regNo','students','phone','password'], {name:'Home Name', regNo:'Registration Number', students:'Resident Count', phone:'Mobile Number', password:'Password'});
+      if(!f) return;
+      const newHome = {id:genId('H'), name:f.get('name'), type:f.get('type'), regNo:f.get('regNo'), students:Number(f.get('students')||0), lat:12.9+Math.random()*0.15, lng:79.1+Math.random()*0.15, need:f.get('need'), foodReq:f.get('foodReq')||'-', upi:f.get('upi')||'-', address:f.get('address')||'-', phone:f.get('phone'), password:f.get('password')};
+      state.homes.push(newHome);
+      await persist('homes');
+      state.homeSession = newHome; persistHomeSession();
+      toast('✅ Home registered & logged in: '+f.get('name'));
+      form.reset();
+      updateCounts();
+      updateSessionChip();
+    };
+  }
+  if(tab==='donate-food'){
+    const updateLive = ()=>{
+      const qty = document.getElementById('qtyInput').value;
+      document.getElementById('liveMatchList').innerHTML = renderLiveMatch(qty);
+    };
+    document.getElementById('qtyInput').addEventListener('input', updateLive);
+    document.getElementById('foodSubmitBtn').onclick = async ()=>{
+      const form = document.getElementById('foodForm');
+      const f = validateForm(form, ['food','qty'], {food:'Food Name', qty:'Quantity'});
+      if(!f) return;
+      const donor = state.session || state.donors[0];
+      const qty = f.get('qty');
+      const ranked = state.homes.map(h=>({...h, ...aiMatchScore(donor.lat, donor.lng, h, qty)})).sort((a,b)=>b.score-a.score);
+      const best = ranked[0];
+      if(!best){ toast('⚠ No homes registered yet to match against'); return; }
+      state.foodDonations.push({id:genId('FD'), food:f.get('food'), qty, vegType:f.get('vegType'), matchedHome:best.name, matchedHomeId:best.id, donorName:donor.name, donorId:donor.id, score:best.score, status:'Pending', driver:null});
+      await persist('foodDonations');
+      document.getElementById('aiPreview').innerHTML = `<div style="font-size:13px;"><b style="color:var(--forest)">✅ Best match found:</b> ${best.name}<br>
+        <span style="color:var(--ink-soft)">Distance: ${best.dist.toFixed(1)} km · Need: ${best.need} · Qty fit: ${best.qtyFit}% · Match score: ${best.score}/100</span>
+        <div class="match-bar" style="margin-top:8px;width:100%;"><div class="match-bar-fill" style="width:${best.score}%"></div></div>
+        <div style="margin-top:10px;font-size:12px;">Pickup before <b>${f.get('pickupTime')||'—'}</b>. Notification sent to ${best.name} admin.</div></div>`;
+      document.getElementById('liveMatchList').innerHTML = renderLiveMatch(qty);
+      toast('🍲 Food posted — AI matched with '+best.name);
+      form.reset();
+    };
+  }
+  if(tab==='emergency'){
+    document.getElementById('emergSubmitBtn').onclick = async ()=>{
+      const form = document.getElementById('emergForm');
+      const f = validateForm(form, ['item','urgency'], {item:'Item Needed', urgency:'Urgency'});
+      if(!f) return;
+      state.emergencies.push({id:genId('E'), home:f.get('home'), item:f.get('item'), urgency:f.get('urgency'), posted:'just now'});
+      await persist('emergencies');
+      document.getElementById('emergList').innerHTML = renderEmergencyList();
+      toast('🚨 Emergency request posted to nearby donors');
+      form.reset();
+    };
+  }
+  if(tab==='chat'){
+    document.getElementById('waToHomeBtn').onclick = ()=>{
+      const home = state.homes.find(h=>h.id===document.getElementById('chatHomeSel').value);
+      const donor = state.donors.find(d=>d.id===document.getElementById('chatDonorSel').value);
+      if(!home){ toast('⚠ Select a home first'); return; }
+      openWhatsApp(home.phone, `Vanakkam! I'm ${donor?donor.name:'a donor'}${donor&&donor.hotel?' from '+donor.hotel:''}, reaching out via AnnaSetu about a food donation for ${home.name}.`);
+    };
+    document.getElementById('waToDonorBtn').onclick = ()=>{
+      const donor = state.donors.find(d=>d.id===document.getElementById('chatDonorSel').value);
+      const home = state.homes.find(h=>h.id===document.getElementById('chatHomeSel').value);
+      if(!donor){ toast('⚠ Select a donor first'); return; }
+      openWhatsApp(donor.whatsapp||donor.phone, `Vanakkam ${donor.name}! This is ${home?home.name:'a home'} reaching out via AnnaSetu regarding your food donation.`);
+    };
+  }
+}
+
+/* ================= NAV ================= */
+document.querySelectorAll('.nav-item').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    highlightNav(btn.dataset.tab);
+    render(btn.dataset.tab);
+  });
+});
+document.getElementById('syncPill').addEventListener('click', ()=>syncNow(true));
+
+/* ================= LIVE SYNC ================= */
+const LIVE_TABS = ['dashboard','homes','profiles','history','chat','emergency'];
+async function syncNow(manual){
+  if(manual){
+    // manual click = retry connecting from scratch, even after the circuit breaker tripped
+    storageAvailable = (typeof window !== 'undefined' && !!window.storage);
+    storageFailCount = 0;
+    setSync('Syncing…', true);
+  }
+  if(!storageAvailable){
+    setSync('💾 Local mode — working on this device only', false);
+    return;
+  }
+  await loadAll();
+  if(storageAvailable){
+    if(LIVE_TABS.includes(state.currentTab)) render(state.currentTab);
+    else { updateCounts(); updateSessionChip(); }
+    setSync('☁ Live · synced just now', true);
+  }
+}
+setInterval(()=>{ if(storageAvailable && LIVE_TABS.includes(state.currentTab)) syncNow(false); }, 8000);
+
+/* ================= BOOT ================= */
+(async function boot(){
+  setSync('Connecting…', false);
+  await loadAll();
+  setSync(storageAvailable ? '☁ Live · shared storage connected' : '💾 Local mode — working on this device only', storageAvailable);
+  render('dashboard');
+})();
+</script>
+</body>
+</html>
